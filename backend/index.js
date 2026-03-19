@@ -14,7 +14,7 @@ const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY
 });
 
-// ✅ Generate text
+
 async function generateContent(prompt) {
     const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
@@ -24,12 +24,12 @@ async function generateContent(prompt) {
     return response.text;
 }
 
-// ✅ Bot ready
+
 client.once("ready", () => {
     console.log("Bot is ready");
 });
 
-// ✅ Listen messages
+
 client.on("messageCreate", async (message) => {
     if (message.author.bot) return;
 
@@ -42,7 +42,7 @@ client.on("messageCreate", async (message) => {
 
     } catch (error) {
         console.error(error);
-        message.reply("Something went wrong 😢");
+        message.reply("Something went wrong ");
     }
 });
 
