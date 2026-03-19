@@ -1,20 +1,49 @@
 require("dotenv").config();
 const { Client, GatewayIntentBits } = require("discord.js");
+const { GoogleGenAI } = require("@google/genai");
 
 const client = new Client({
     intents: [
-        GatewayIntentBits.Guilds,   //know ur server
-        GatewayIntentBits.GuildMessages,  //know when someone message
-        GatewayIntentBits.MessageContent    // see the actual text
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent
     ]
 });
 
-client.once("ready", () => {
-    console.log("Bot is ready ");
+const ai = new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY
 });
 
-client.on("messageCreate", (message) => {
-    console.log(`Message received: ${message.content}`);
+// ✅ Generate text
+async function generateContent(prompt) {
+    const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt
+    });
+
+    return response.text;
+}
+
+// ✅ Bot ready
+client.once("ready", () => {
+    console.log("Bot is ready");
+});
+
+// ✅ Listen messages
+client.on("messageCreate", async (message) => {
+    if (message.author.bot) return;
+
+    try {
+        const userMessage = message.content;
+
+        const reply = await generateContent(userMessage);
+
+        await message.reply(reply);
+
+    } catch (error) {
+        console.error(error);
+        message.reply("Something went wrong 😢");
+    }
 });
 
 client.login(process.env.DISCORD_BOT_TOKEN);
